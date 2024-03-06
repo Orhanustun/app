@@ -1,0 +1,71 @@
+
+class WeatherData:
+    def __init__(self, data):
+        self.date = data.get("date")
+        self.day = data.get("day")
+        self.icon = data.get("icon")
+        self.description = data.get("description")
+        self.status = data.get("status")
+        self.degree = float(data.get("degree", 0))
+        self.min = float(data.get("min", 0))
+        self.max = float(data.get("max", 0))
+        self.night = float(data.get("night", 0))
+        self.humidity = int(data.get("humidity", 0))
+
+    def __str__(self):
+        return f"{self.date} - {self.day}: {self.description} (Min: {self.min}, Max: {self.max}, Humidity: {self.humidity}%)"
+
+
+
+name = input("Please write your name: ")
+age = float(input("Please Enter your age:"))
+health_issue = input("Please write if you have any health issues: ")
+
+class WeatherData:
+    def __init__(self, data):
+        self.date = data.get("date")
+        self.day = data.get("day")
+        self.icon = data.get("icon")
+        self.description = data.get("description")
+        self.status = data.get("status")
+        self.degree = float(data.get("degree", 0))
+        self.min = float(data.get("min", 0))
+        self.max = float(data.get("max", 0))
+        self.night = float(data.get("night", 0))
+        self.humidity = int(data.get("humidity", 0))
+
+    def __str__(self):
+        return f"{self.date} - {self.day}: {self.description} (Min: {self.min}, Max: {self.max}, Humidity: {self.humidity}%)"
+
+import http.client
+import json
+
+def get_weather(city):
+    conn = http.client.HTTPSConnection("api.collectapi.com")
+    headers = {
+        'content-type': "application/json",
+        'authorization': "apikey 7b7C2JirCFg2Qz3Ke7tfKs:03Y2P58IMXKN6VwJEj7Trk"
+    }
+    conn.request("GET", f"/weather/getWeather?data.lang=tr&data.city={city}", headers=headers)
+
+    response = conn.getresponse()
+    data = response.read()
+    weather_info = json.loads(data.decode("utf-8"))
+
+    weather_data_list = [WeatherData(item) for item in weather_info.get("result", [])]
+
+    conn.close()
+
+    return weather_data_list
+
+
+
+# Example usage
+weather_data = get_weather("izmir")
+for weather in weather_data:
+
+  if health_issue.lower() == "yes":
+        print(weather)
+        print("Be careful for the weather; it can affect your health.")
+else:
+        print(weather)

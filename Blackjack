@@ -1,0 +1,112 @@
+import random
+
+FACE_CARD_VALUE = 10 # => Yüz kartlarının değeri, As'ın maksimum değeri ve minimum değeri olarak sabitler belirler.
+ACE_MAX_VALUE = 11 # => Yüz kartlarının değeri, As'ın maksimum değeri ve minimum değeri olarak sabitler belirler.
+ACE_MIN_VALUE = 1 # => Yüz kartlarının değeri, As'ın maksimum değeri ve minimum değeri olarak sabitler belirler
+
+def initialize_deck(): # => Standart bir 52 kartlık bir deste oluşturur ve karıştırır.
+    """Initialize a standard deck of cards."""
+    ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+    suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades']
+    deck = [{'rank': rank, 'suit': suit} for rank in ranks for suit in suits]
+    random.shuffle(deck)
+    return deck
+
+def calculate_hand_value(hand): # => Bir elin değerini hesaplar.
+    """Calculate the value of a hand."""
+    total_value = 0
+    num_aces = 0
+
+    for card in hand:
+        if card['rank'] in ['K', 'Q', 'J']:
+            total_value += FACE_CARD_VALUE
+        elif card['rank'] == 'A':
+            num_aces += 1
+            total_value += ACE_MAX_VALUE
+        else:
+            total_value += int(card['rank'])
+
+    while total_value > 21 and num_aces:
+        total_value -= 10
+        num_aces -= 1
+
+    return total_value
+
+def display_hand(hand, hide_first_card=False): # => İlk kartın gizlenip gizlenmeyeceğini belirler.
+    """Display the cards in a hand."""
+    if hide_first_card:
+        print("Hidden Card")
+        for card in hand[1:]:
+            print(f"{card['rank']} of {card['suit']}")
+    else:
+        for card in hand:
+            print(f"{card['rank']} of {card['suit']}")
+
+def blackjack(player_name): # => Blackjack oyununu oynar.
+    """Play a game of Blackjack."""
+    player_hand = []
+    dealer_hand = []
+    deck = initialize_deck()
+
+    for _ in range(2):
+        player_hand.append(deck.pop())
+        dealer_hand.append(deck.pop())
+
+    print("\nYour Hand:")
+    display_hand(player_hand)
+    print("Total value of your hand:", calculate_hand_value(player_hand))
+
+    print("\nDealer's Hand:")
+    display_hand(dealer_hand, hide_first_card=True)
+
+    while calculate_hand_value(player_hand) < 21:
+        action = input("\nDo you want to hit or stand? (h/s): ").lower()
+        if action == 'h' or action == 'hit':
+            player_hand.append(deck.pop())
+            print("\nYour Hand:")
+            display_hand(player_hand)
+            print("Total value of your hand:", calculate_hand_value(player_hand))
+        elif action == 's' or action == 'stand':
+            break
+        else:
+            print("Invalid input. Please enter 'h' to hit or 's' to stand.")
+
+    while calculate_hand_value(dealer_hand) < 17:
+        dealer_hand.append(deck.pop())
+
+    print("\nYour Hand:")
+    display_hand(player_hand)
+    print("Total value of your hand:", calculate_hand_value(player_hand))
+
+    print("\nDealer's Hand:")
+    display_hand(dealer_hand)
+    print("Total value of dealer's hand:", calculate_hand_value(dealer_hand))
+
+    player_score = calculate_hand_value(player_hand)
+    dealer_score = calculate_hand_value(dealer_hand)
+
+    print("\nGame Over!")
+    if player_score > 21:
+        print(f"You busted Mr {player_name}! Dealer wins.")
+        print("Dealer wins with", dealer_score, "points")
+    elif dealer_score > 21:
+        print(f"Dealer busted! You win Mr {player_name}.")
+        print("Player wins with", player_score, "points")
+    elif player_score > dealer_score:
+        print(f"You win Mr {player_name}!")
+        print("Player wins with", player_score, "points")
+    elif dealer_score > player_score:
+        print("Dealer wins.")
+        print("Dealer wins with", dealer_score, "points")
+    else:
+        print("It's a tie!")
+        print("Scores:", player_score, "and", dealer_score)
+
+if __name__ == "__main__":
+    name = input("What is your name, sir: ")
+    print(f"Hello Mr {name}. I will mention the game rules to you shortly.")
+    print("RULE 1: Players are dealt 2 cards at the beginning of the game.")
+    print("RULE 2: If the total value of the cards in the player's hand exceeds 21, the player loses.")
+    print("RULE 3: The aim of the game is to get as close to the number 21 as possible, but not to exceed 21")
+
+    blackjack(name)
